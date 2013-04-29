@@ -41,6 +41,8 @@
 #import "IncomingCallViewController.h"
 #import "ConsoleViewController.h"
 #import "ImageViewController.h"
+#import "TopUpViewController.h"
+
 
 @interface PhoneMainView : UIViewController<IncomingCallViewDelegate> {
     @private
