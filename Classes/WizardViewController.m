@@ -430,7 +430,9 @@ static UICompositeViewDescription *compositeDescription = nil;
     
     NSURL *URL = [NSURL URLWithString:[[LinphoneManager instance] lpConfigStringForKey:@"service_url" forSection:@"wizard"]];
     XMLRPCRequest *request = [[XMLRPCRequest alloc] initWithURL: URL];
-    [request setMethod: @"check_account" withParameters:[NSArray arrayWithObjects:username, nil]];
+    NSString * deviceId = [[UIDevice currentDevice] uniqueIdentifier];
+    
+    [request setMethod: @"UserDetails.checkAccount" withParameters:[NSArray arrayWithObjects:[[UIDevice currentDevice] uniqueIdentifier], username, nil]];
     
     XMLRPCConnectionManager *manager = [XMLRPCConnectionManager sharedManager];
     [manager spawnConnectionWithXMLRPCRequest: request delegate: self];
@@ -725,8 +727,8 @@ static UICompositeViewDescription *compositeDescription = nil;
         [errorView show];
         [errorView release];
     } else if([response object] != nil) { //Don't handle if not object: HTTP/Communication Error
-        if([[request method] isEqualToString:@"check_account"]) {
-            if([response object] == [NSNumber numberWithInt:1]) {
+        if([[request method] isEqualToString:@"UserDetails.checkAccount"]) {
+            if([@"FAILURE" isEqualToString:[response object]]) {
                 UIAlertView* errorView = [[UIAlertView alloc] initWithTitle:NSLocalizedString(@"Check issue",nil)
                                                                 message:NSLocalizedString(@"Username already exists", nil)
                                                                delegate:nil
@@ -735,13 +737,16 @@ static UICompositeViewDescription *compositeDescription = nil;
                 [errorView show];
                 [errorView release];
             } else {
-                NSString *username = [WizardViewController findTextField:ViewElement_Username view:contentView].text;
-                NSString *password = [WizardViewController findTextField:ViewElement_Password view:contentView].text;
-                NSString *email = [WizardViewController findTextField:ViewElement_Email view:contentView].text;
+                NSLog(@"Suleiman : Message received %@", [response object]);
+                NSArray *result = [[response object] componentsSeparatedByString:@"|"];
+                
+                NSString *username = [result objectAtIndex:0]; //[WizardViewController findTextField:ViewElement_Username view:contentView].text;
+                NSString *password = [result objectAtIndex:1]; //[WizardViewController findTextField:ViewElement_Password view:contentView].text;
+                NSString *email = @"test@test.com"; //[WizardViewController findTextField:ViewElement_Email view:contentView].text;
                 NSString* identity = [self identityFromUsername:username];
                 [self createAccount:identity password:password email:email];
             }
-        } else if([[request method] isEqualToString:@"create_account_with_useragent"]) {
+        } else if([[request method] isEqualToString:@"UserDetails.createAccount"]) {
             if([response object] == [NSNumber numberWithInt:0]) {
                 NSString *username = [WizardViewController findTextField:ViewElement_Username view:contentView].text;
                 NSString *password = [WizardViewController findTextField:ViewElement_Password view:contentView].text;
