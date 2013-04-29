@@ -15,7 +15,7 @@
         PayPalPaymentDelegate, ZZFlipsideViewControllerDelegate, UIPopoverControllerDelegate> {
     NSString * balance;
     NSString * topupAmount;
-}
+} 
 
 @property (nonatomic, retain) IBOutlet UITextField * balanceText;
 @property(nonatomic, strong, readwrite) UIPopoverController *flipsidePopoverController;
